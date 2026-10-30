@@ -1,0 +1,12 @@
+# este archivo le indica a Git qué carpetas y archivos debe ignorar por completo para que no se suban a GitHub.
+# Ignora subir la carpeta de compilados de Maven. Evita subir archivos pesados como los .class, .jar o .war
+target/
+
+# Ignora subir la configuracion local del editor
+.vscode/
+
+# Ignora subir los archivos temporales de Excel (se crean al tener el .xlsx abierto)
+~$*
+
+#  Mantiene limpio el repositorio de GitHub, evitando subir archivos innecesarios que no aportan al proyecto.
+.github/modernize/

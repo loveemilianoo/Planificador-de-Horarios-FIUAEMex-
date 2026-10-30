@@ -1,5 +1,7 @@
-import java.util.Objects;
+package model;
+
 import java.util.List;
+import java.util.Objects;
 
 public record Grupo(String clave, String claveMateria, String docente, List<Horario> horarios) {
     public Grupo {
