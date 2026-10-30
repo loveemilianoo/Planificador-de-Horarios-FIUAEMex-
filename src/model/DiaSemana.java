@@ -1,3 +1,5 @@
+package model;
+
 public enum DiaSemana {
-    LUN, MAR, MIER, JUE, VIE, SAB, DOM
+    LUN, MAR, MIE, JUE, VIE, SAB
 }

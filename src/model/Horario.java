@@ -1,5 +1,7 @@
-import java.util.Objects;
+package model;
+
 import java.time.LocalTime;
+import java.util.Objects;
 
 public record Horario(DiaSemana dia, LocalTime inicio, LocalTime fin, String aula) {
     public Horario {
