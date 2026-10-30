@@ -47,6 +47,9 @@ import model.OfertaAcademica;
  *       se anotan y se pueden consultar con {@link #getAdvertencias()}.</li>
  *   <li>Las materias optativas (semestre "OPT1-8", etc.) se guardan con semestre
  *       {@link #SEMESTRE_OPTATIVA} (0).</li>
+ *   <li>Si una clave aparece con nombres o semestres distintos, o un mismo grupo aparece repetido, o hay
+ *       filas con clave pero sin nombre (o al revés), NO se detiene la lectura: se avisa en
+ *       {@link #getAdvertencias()}. Con claves repetidas se conserva el primer nombre y el primer semestre.</li>
  *   <li>NO es seguro para uso simultáneo desde varios hilos (guarda las advertencias en un campo).
  *       En el backend web conviene crear un {@code new ExcelOfertaReader()} por cada archivo subido.</li>
  * </ul>
@@ -144,8 +147,13 @@ public class ExcelOfertaReader implements OfertaReader {
                 int numFila = i + 1; // número de fila como lo ve el usuario en Excel (POI cuenta desde 0)
                 String clave = texto(fila.getCell(cols.clave));
                 String nombre = texto(fila.getCell(cols.nombre));
-                // Filas sin clave o sin nombre no son materias (vacías, notas, catálogo de aulas del final)
-                if (clave.isEmpty() || nombre.isEmpty()) continue;
+                // Filas sin clave y sin nombre no son materias (vacías, notas, catálogo de aulas del final)
+                if (clave.isEmpty() && nombre.isEmpty()) continue;
+                // Fila "a medias": tiene clave o nombre pero no ambos. Se omite, pero se avisa para no perder datos en silencio.
+                if (clave.isEmpty() || nombre.isEmpty()) {
+                    advertir(numFila, "fila incompleta (clave='" + clave + "', nombre='" + nombre + "'); fila omitida");
+                    continue;
+                }
 
                 String claveGrupo = texto(fila.getCell(cols.grupo));
                 if (claveGrupo.isEmpty()) {
@@ -160,17 +168,32 @@ public class ExcelOfertaReader implements OfertaReader {
                     advertir(numFila, "el grupo " + clave + "/" + claveGrupo + " no tiene ningun horario");
                 }
 
-                // El nombre y el semestre son de la MATERIA: se guardan la primera vez que aparece su clave
-                nombres.putIfAbsent(clave, nombre);
-                if (!semestres.containsKey(clave)) {
-                    String semestreTexto = cols.semestre >= 0 ? texto(fila.getCell(cols.semestre)) : "";
-                    semestres.put(clave, leerSemestre(semestreTexto, numFila));
+                // El nombre y el semestre son de la MATERIA: se guardan la primera vez que aparece su clave.
+                // Si la misma clave vuelve a aparecer con otro nombre u otro semestre se avisa (no se detiene la
+                // lectura): puede ser un error de captura o dos materias distintas que comparten clave.
+                String nombrePrevio = nombres.putIfAbsent(clave, nombre);
+                if (nombrePrevio != null && !normalizar(nombrePrevio).equals(normalizar(nombre))) {
+                    advertir(numFila, "la clave " + clave + " ya se usa para '" + nombrePrevio + "' y aquí aparece como '"
+                            + nombre + "'; se conserva el primer nombre y este grupo se agrega a esa materia");
+                }
+                String semestreTexto = cols.semestre >= 0 ? texto(fila.getCell(cols.semestre)) : "";
+                int semestreFila = leerSemestre(semestreTexto, numFila);
+                Integer semestrePrevio = semestres.putIfAbsent(clave, semestreFila);
+                if (semestrePrevio != null && semestrePrevio.intValue() != semestreFila) {
+                    advertir(numFila, "la materia " + clave + " aparece con semestre " + semestreFila
+                            + " pero antes tenía semestre " + semestrePrevio + "; se conserva el primero");
                 }
 
                 // Se agrega el grupo a la lista de su materia (creando la lista si es el primero)
-                gruposPorMateria
-                        .computeIfAbsent(clave, k -> new ArrayList<>())
-                        .add(new Grupo(claveGrupo, clave, docente, horarios));
+                List<Grupo> gruposDeLaMateria = gruposPorMateria.computeIfAbsent(clave, k -> new ArrayList<>());
+                for (Grupo existente : gruposDeLaMateria) {
+                    if (existente.clave().equals(claveGrupo)) {
+                        advertir(numFila, "el grupo " + clave + "/" + claveGrupo
+                                + " aparece repetido; se conservan ambos");
+                        break;
+                    }
+                }
+                gruposDeLaMateria.add(new Grupo(claveGrupo, clave, docente, horarios));
             }
 
             // ---- 3. Armar los objetos Materia (una por clave, con todos sus grupos) ----
