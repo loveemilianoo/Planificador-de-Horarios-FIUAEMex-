@@ -3,6 +3,7 @@ package model;
 import java.util.Map;
 import java.util.Objects;
  
+/** Contiene el catálogo de materias ofrecidas para generar horarios. */
 public record OfertaAcademica(Map<String, Materia> materias) { 
     public OfertaAcademica {
         Objects.requireNonNull(materias, "materias es obligatorio");

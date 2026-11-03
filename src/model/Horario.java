@@ -3,6 +3,7 @@ package model;
 import java.time.LocalTime;
 import java.util.Objects;
 
+/** Describe una sesión de clase mediante el día, el intervalo de tiempo y el aula. */
 public record Horario(DiaSemana dia, LocalTime inicio, LocalTime fin, String aula) {
     public Horario {
         Objects.requireNonNull(dia, "día es obligatorio");

@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 import java.util.Objects;
  
+/** Representa una materia académica y los grupos disponibles para cursarla. */
 public record Materia(String clave, String nombre, int semestre, List<Grupo> grupos) {
  
     public Materia {

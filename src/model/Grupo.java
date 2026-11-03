@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 import java.util.Objects;
 
+/** Representa un grupo de una materia, con su docente y horarios de clase. */
 public record Grupo(String clave, String claveMateria, String docente, List<Horario> horarios) {
     public Grupo {
         Objects.requireNonNull(clave, "clave es obligatorio");

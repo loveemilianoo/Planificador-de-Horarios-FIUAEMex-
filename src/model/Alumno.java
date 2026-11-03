@@ -2,6 +2,7 @@ package model;
 
 import java.util.Set;
 
+/** Representa al alumno y sus materias, preferencias y semestre actual. */
 public record Alumno(
     Set<String> aprobadas,
     Set<String> deseadas,
