@@ -15,9 +15,9 @@ import model.OpcionHorario;
 /**
  * Califica qué tan cómodo es un horario para ordenar las opciones (menor puntaje = mejor).
  *
- * <p>Puntaje = minutos totales de huecos entre clases del mismo día
+ * Puntaje = minutos totales de huecos entre clases del mismo día
  * + {@value #PESO_DIA_MINUTOS} minutos por cada día distinto en que hay que ir a la facultad.
- * Se asume que la opción ya no tiene traslapes.</p>
+ * Se asume que la opción ya no tiene traslapes.
  */
 public final class EvaluadorOpcion {
 

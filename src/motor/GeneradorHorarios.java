@@ -10,14 +10,12 @@ import model.OpcionHorario;
 /**
  * Núcleo combinatorio (actividad A6.2): elige exactamente un grupo por materia sin traslapes.
  *
- * <h3>Estrategia (riesgo R08)</h3>
- * <ul>
- *   <li><b>Backtracking con poda</b>: en cuanto un grupo se traslapa con los ya elegidos se descarta
- *       esa rama completa, sin explorar sus combinaciones.</li>
- *   <li><b>Materias con menos grupos primero</b>: las más restrictivas fallan antes y podan más.</li>
- *   <li><b>Tope de candidatas</b>: se detiene al juntar {@link ConfiguracionMotor#maxCandidatas()}
- *       combinaciones válidas; luego se ordenan con {@link EvaluadorOpcion} y se entregan las mejores.</li>
- * </ul>
+ * Estrategia (riesgo R08):
+ * - Backtracking con poda: en cuanto un grupo se traslapa con los ya elegidos se descarta esa rama
+ *   completa, sin explorar sus combinaciones.
+ * - Materias con menos grupos primero: las más restrictivas fallan antes y podan más.
+ * - Tope de candidatas: se detiene al juntar {@link ConfiguracionMotor#maxCandidatas()} combinaciones
+ *   válidas; luego se ordenan con {@link EvaluadorOpcion} y se entregan las mejores.
  */
 public class GeneradorHorarios {
 

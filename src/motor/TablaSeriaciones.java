@@ -10,8 +10,8 @@ import java.util.TreeSet;
  * Tabla de seriaciones reglamentarias: para cada materia, las claves de las materias que se
  * deben tener aprobadas antes de poder cursarla.
  *
- * <p>Una materia que no aparece en la tabla no tiene prerrequisitos. La tabla es inmutable.
- * Los datos reales deben venir de la tabla oficial validada por la Coordinación (hito H1).</p>
+ * Una materia que no aparece en la tabla no tiene prerrequisitos. La tabla es inmutable.
+ * Los datos reales deben venir de la tabla oficial validada por la Coordinación (hito H1).
  */
 public class TablaSeriaciones {
 

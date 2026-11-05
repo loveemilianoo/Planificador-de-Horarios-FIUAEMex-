@@ -11,11 +11,13 @@ import model.OfertaAcademica;
 /**
  * Punto de entrada del motor. El servlet solo necesita llamar a {@link #generar}.
  *
- * <p>Flujo: (1) filtra materias deseadas (aprobadas, existencia, seriación) →
- * (2) filtra grupos por día libre y turno → (3) backtracking sin traslapes →
- * (4) ordena y entrega de 2 a 4 opciones, con avisos si el escenario es infactible.</p>
+ * Flujo:
+ * 1. Filtra materias deseadas (aprobadas, existencia y seriación).
+ * 2. Filtra grupos por día libre y turno.
+ * 3. Busca combinaciones sin traslapes.
+ * 4. Ordena y entrega de 2 a 4 opciones, con avisos si el escenario es infactible.
  *
- * <p>No guarda estado entre llamadas, por lo que una sola instancia sirve para varios usuarios a la vez.</p>
+ * No guarda estado entre llamadas, por lo que una sola instancia sirve para varios usuarios a la vez.
  */
 public class MotorHorarios {
 

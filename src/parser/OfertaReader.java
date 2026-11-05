@@ -7,15 +7,15 @@ import model.OfertaAcademica;
 /**
  * Contrato común de todos los lectores de oferta académica.
  *
- * <p>Un "lector" toma un archivo (Excel, JSON, etc.) y lo convierte en un objeto
+ * Un "lector" toma un archivo (Excel, JSON, etc.) y lo convierte en un objeto
  * {@link OfertaAcademica}, que es lo que usa el resto del sistema (filtros, motor combinatorio...).
- * Así, el resto del sistema no necesita saber de qué tipo de archivo vino la información.</p>
+ * Así, el resto del sistema no necesita saber de qué tipo de archivo vino la información.
  *
- * <p>Implementaciones actuales: {@link ExcelOfertaReader} y {@link JsonOfertaReader}.</p>
+ * Implementaciones actuales: {@link ExcelOfertaReader} y {@link JsonOfertaReader}.
  *
- * <p>Decisión de diseño: el método recibe un {@link InputStream} y no una ruta de archivo.
+ * Decisión de diseño: el método recibe un {@link InputStream} y no una ruta de archivo.
  * Gracias a eso el mismo lector sirve para un archivo del disco (en pruebas) y para un archivo
- * que el usuario sube desde la página web, sin cambiar ni una línea del lector.</p>
+ * que el usuario sube desde la página web, sin cambiar ni una línea del lector.
  */
 public interface OfertaReader {
 

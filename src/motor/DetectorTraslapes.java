@@ -8,8 +8,8 @@ import model.Horario;
 /**
  * Detecta empalmes de horario. Es la base de la poda del backtracking.
  *
- * <p>Dos clases se traslapan si son el mismo día y sus intervalos se cruzan. Si una termina
- * justo cuando empieza la otra (10:00 y 10:00) NO se consideran traslapadas.</p>
+ * Dos clases se traslapan si son el mismo día y sus intervalos se cruzan. Si una termina
+ * justo cuando empieza la otra (10:00 y 10:00), NO se consideran traslapadas.
  */
 public final class DetectorTraslapes {
 

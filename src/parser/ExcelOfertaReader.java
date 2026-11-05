@@ -29,37 +29,33 @@ import model.OfertaAcademica;
 /**
  * Lee la plantilla de horarios de la UAEMex (.xlsx) y la convierte en una {@link OfertaAcademica}.
  *
- * <h3>Cómo funciona</h3>
- * <ol>
- *   <li>Busca la hoja y la fila de encabezados (la que dice "UNIDAD DE APRENDIZAJE").</li>
- *   <li>Detecta en qué columna está cada dato (Sem, CLAVE, UNIDAD DE APRENDIZAJE, GPO, DOCENTE)
- *       y dónde empieza el bloque de cada día (LUNES..SABADO, cada uno con INI / FIN / AULA).
- *       Se hace por el NOMBRE del encabezado y no por número de columna, porque las plantillas
- *       2025B y 2026A no tienen las mismas columnas.</li>
- *   <li>Recorre las filas: cada fila es un GRUPO de una materia. Las filas con la misma clave se
- *       agrupan dentro de una misma {@link Materia}.</li>
- * </ol>
+ * Cómo funciona:
+ * 1. Busca la hoja y la fila de encabezados (la que dice "UNIDAD DE APRENDIZAJE").
+ * 2. Detecta en qué columna está cada dato (Sem, CLAVE, UNIDAD DE APRENDIZAJE, GPO, DOCENTE)
+ *    y dónde empieza el bloque de cada día (LUNES..SABADO, cada uno con INI / FIN / AULA).
+ *    Se hace por el nombre del encabezado y no por número de columna, porque las plantillas
+ *    2025B y 2026A no tienen las mismas columnas.
+ * 3. Recorre las filas: cada fila es un grupo de una materia. Las filas con la misma clave se
+ *    agrupan dentro de una misma {@link Materia}.
  *
- * <h3>Notas importantes</h3>
- * <ul>
- *   <li>Si no se indica nombre de hoja, usa la primera hoja que contenga los encabezados.</li>
- *   <li>Los problemas en filas individuales (hora inválida, grupo vacío...) NO detienen la lectura:
- *       se anotan y se pueden consultar con {@link #getAdvertencias()}.</li>
- *   <li>Las materias optativas (semestre "OPT1-8", etc.) se guardan con semestre
- *       {@link #SEMESTRE_OPTATIVA} (0).</li>
- *   <li>Si una clave aparece con nombres o semestres distintos, o un mismo grupo aparece repetido, o hay
- *       filas con clave pero sin nombre (o al revés), NO se detiene la lectura: se avisa en
- *       {@link #getAdvertencias()}. Con claves repetidas se conserva el primer nombre y el primer semestre.</li>
- *   <li>NO es seguro para uso simultáneo desde varios hilos (guarda las advertencias en un campo).
- *       En el backend web conviene crear un {@code new ExcelOfertaReader()} por cada archivo subido.</li>
- * </ul>
+ * Notas importantes:
+ * - Si no se indica nombre de hoja, usa la primera hoja que contenga los encabezados.
+ * - Los problemas en filas individuales (hora inválida, grupo vacío...) NO detienen la lectura:
+ *   se anotan y se pueden consultar con {@link #getAdvertencias()}.
+ * - Las materias optativas (semestre "OPT1-8", etc.) se guardan con semestre
+ *   {@link #SEMESTRE_OPTATIVA} (0).
+ * - Si una clave aparece con nombres o semestres distintos, un grupo aparece repetido, o hay
+ *   filas con clave pero sin nombre (o al revés), NO se detiene la lectura: se avisa en
+ *   {@link #getAdvertencias()}. Con claves repetidas se conserva el primer nombre y el primer semestre.
+ * - NO es seguro para uso simultáneo desde varios hilos (guarda las advertencias en un campo).
+ *   En el backend web conviene crear un {@code ExcelOfertaReader} por cada archivo subido.
  *
- * <h3>Ejemplo de uso</h3>
- * <pre>
+ * Ejemplo de uso:
+ * {@code
  * ExcelOfertaReader lector = new ExcelOfertaReader();
  * OfertaAcademica oferta = lector.leer(inputStreamDelArchivo);
- * List&lt;String&gt; avisos = lector.getAdvertencias();
- * </pre>
+ * var avisos = lector.getAdvertencias();
+ * }
  */
 public class ExcelOfertaReader implements OfertaReader {
 
@@ -270,8 +266,8 @@ public class ExcelOfertaReader implements OfertaReader {
     /**
      * Recorre la fila de encabezados y anota en qué columna está cada dato.
      *
-     * <p>Usa comparación exacta ({@code equals}) con "GPO" a propósito: la plantilla también tiene la
-     * columna "GRUPOS EQUIVALENTES ENTRE PLANES", y si se buscara "GRUPO" se confundiría con esa.</p>
+     * Usa comparación exacta ({@code equals}) con "GPO" a propósito: la plantilla también tiene la
+     * columna "GRUPOS EQUIVALENTES ENTRE PLANES", y si se buscara "GRUPO" se confundiría con esa
      */
     private Columnas mapearColumnas(Row encabezado) throws ParserException {
         Columnas cols = new Columnas();
@@ -340,8 +336,8 @@ public class ExcelOfertaReader implements OfertaReader {
     /**
      * Convierte una celda en una hora.
      *
-     * <p>Excel guarda las horas como fracción del día (9:00 = 0.375). Esta función soporta tanto
-     * celdas de hora reales como horas escritas como texto ("9:00" o "09:00").</p>
+     * Excel guarda las horas como fracción del día (9:00 = 0.375). Esta función soporta tanto
+     * celdas de hora reales como horas escritas como texto ("9:00" o "09:00"). 
      *
      * @return la hora, o null si la celda está vacía
      */

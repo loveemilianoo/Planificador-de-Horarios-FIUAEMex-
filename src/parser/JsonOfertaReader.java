@@ -21,30 +21,27 @@ import model.OfertaAcademica;
 /**
  * Lee la oferta académica desde un archivo JSON y la convierte en una {@link OfertaAcademica}.
  *
- * <h3>Formato esperado del JSON</h3>
- * <pre>
- * {
- *   "materias": [
- *     { "clave": "LINC11", "nombre": "FISICA", "semestre": 1,
- *       "grupos": [
- *         { "clave": "CO01", "docente": "DRA. QUINTANA GUERRA MARIA ROSA",
- *           "horarios": [ { "dia": "LUN", "inicio": "09:00", "fin": "11:00", "aula": "C-303" } ] }
- *       ] }
- *   ]
- * }
- * </pre>
+ * Formato esperado del JSON:
+ *     {
+ *       "materias": [
+ *         { "clave": "LINC11", "nombre": "FISICA", "semestre": 1,
+ *           "grupos": [
+ *             { "clave": "CO01", "docente": "DRA. QUINTANA GUERRA MARIA ROSA",
+ *               "horarios": [ { "dia": "LUN", "inicio": "09:00", "fin": "11:00", "aula": "C-303" } ] }
+ *           ] }
+ *       ]
+ *     }
  *
- * <ul>
- *   <li>Obligatorios: materia (clave, nombre), grupo (clave) y horario (dia, inicio, fin).</li>
- *   <li>Opcionales: semestre (0 si falta), docente y aula (se usa "N/D" si falta el aula).</li>
- *   <li>Días válidos: LUN, MAR, MIE, JUE, VIE y SAB (el sistema solo trabaja de lunes a sábado; también se acepta MIER como alias de MIE).</li>
- *   <li>Horas en formato HH:mm, por ejemplo "09:00".</li>
- * </ul>
+ * Campos:
+ * - Obligatorios: materia (clave, nombre), grupo (clave) y horario (dia, inicio, fin).
+ * - Opcionales: semestre (0 si falta), docente y aula (se usa "N/D" si falta el aula).
+ * - Días válidos: LUN, MAR, MIE, JUE, VIE y SAB. También se acepta MIER como alias de MIE.
+ * - Horas en formato HH:mm, por ejemplo "09:00".
  *
- * <h3>Decisión de diseño</h3>
- * <p>El modelo se construye "a mano" recorriendo el árbol JSON, en lugar de dejar que Jackson llene los
+ * Decisión de diseño:
+ * El modelo se construye "a mano" recorriendo el árbol JSON, en lugar de dejar que Jackson llene los
  * records automáticamente. Así los mensajes de error son claros (por ejemplo "Falta el campo 'clave' en
- * el grupo LINC11/CO01") y no hace falta agregar más librerías para manejar horas.</p>
+ * el grupo LINC11/CO01") y no hace falta agregar más librerías para manejar horas.
  */
 public class JsonOfertaReader implements OfertaReader {
 

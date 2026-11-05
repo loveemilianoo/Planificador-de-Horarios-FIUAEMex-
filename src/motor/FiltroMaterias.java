@@ -14,8 +14,8 @@ import model.OfertaAcademica;
 /**
  * Decide cuáles de las materias deseadas por el alumno se pueden realmente cursar (actividades A6.1 y A6.3).
  *
- * <p>Una materia deseada se descarta, con su motivo, si: ya está aprobada, no existe en la oferta,
- * no tiene grupos, o al alumno le faltan prerrequisitos de seriación.</p>
+ * Una materia deseada se descarta, con su motivo, si ya está aprobada, no existe en la oferta,
+ * no tiene grupos o al alumno le faltan prerrequisitos de seriación.
  */
 public final class FiltroMaterias {
 

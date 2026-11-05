@@ -10,11 +10,11 @@ import model.Turno;
 /**
  * Aplica las restricciones de horario del alumno a un grupo: día libre y turno preferido.
  *
- * <ul>
- *   <li><b>Día libre</b>: el grupo se rechaza si tiene alguna clase ese día.</li>
- *   <li><b>Turno</b>: MAÑANA = todas las clases empiezan antes de la hora de corte;
- *       TARDE = todas empiezan a la hora de corte o después.</li>
- * </ul>
+ * Restricciones aplicadas:
+ * - Día libre: el grupo se rechaza si tiene alguna clase ese día.
+ * - Turno: MAÑANA significa que todas las clases empiezan antes de la hora de corte;
+ *   TARDE significa que todas empiezan a la hora de corte o después.
+ *
  * Si el alumno no indicó preferencia (null), esa restricción no se aplica.
  */
 public final class FiltroPreferencias {
