@@ -117,6 +117,18 @@ class GeneradorHorariosTest {
     }
 
     @Test
+    @DisplayName("Con exactamente tantas combinaciones como el tope, la búsqueda NO está truncada")
+    void exactamenteElTopeNoEsTruncada() {
+        List<Grupo> a = List.of(
+                g("A", "G1", h(DiaSemana.LUN, "09:00", "10:00")),
+                g("A", "G2", h(DiaSemana.MAR, "09:00", "10:00")));
+        List<Grupo> b = List.of(g("B", "G1", h(DiaSemana.JUE, "09:00", "10:00")));
+        GeneradorHorarios.ResultadoBusqueda r = generador(1, 2, 2).generar(List.of(a, b));
+        assertFalse(r.truncada());
+        assertEquals(2, r.opciones().size());
+    }
+
+    @Test
     @DisplayName("Las opciones salen ordenadas de la mejor (menos huecos) a la peor")
     void ordenadasPorCalidad() {
         List<Grupo> a = List.of(

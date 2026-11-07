@@ -1,5 +1,6 @@
 package main.motor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +38,8 @@ class ResultadoGeneracionTest {
 
         avisos.add("b");
         descartadas.put("Y", "otro");
-        assertTrue(r.avisos().size() == 1 && r.materiasDescartadas().size() == 1);
+        assertEquals(List.of("a"), r.avisos());
+        assertEquals(Map.of("X", "motivo"), r.materiasDescartadas());
         assertThrows(UnsupportedOperationException.class, () -> r.avisos().add("c"));
         assertThrows(UnsupportedOperationException.class, () -> r.opciones().clear());
         assertThrows(UnsupportedOperationException.class, () -> r.materiasDescartadas().clear());

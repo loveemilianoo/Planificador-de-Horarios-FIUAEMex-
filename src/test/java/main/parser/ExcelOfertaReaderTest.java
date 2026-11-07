@@ -12,8 +12,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -22,6 +26,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import main.model.DiaSemana;
 import main.model.Grupo;
@@ -37,7 +43,7 @@ class ExcelOfertaReaderTest {
 
     // Posiciones de columna del libro de prueba
     private static final int SEM = 0, CLAVE = 1, NOMBRE = 2, EQUIV = 3, GPO = 4, DOCENTE = 5;
-    private static final int LUN = 6, MAR = 9, MIE = 12, CLAVE_VIEJA = 15;
+    private static final int LUN = 6, MAR = 9, MIE = 12, JUE = 15, VIE = 18, SAB = 21, CLAVE_VIEJA = 24;
     private static final String HOJA = "Horarios";
 
     private final ExcelOfertaReader lector = new ExcelOfertaReader();
@@ -59,10 +65,13 @@ class ExcelOfertaReaderTest {
         enc.createCell(LUN).setCellValue("LUNES");
         enc.createCell(MAR).setCellValue("MARTES");
         enc.createCell(MIE).setCellValue("MIÉRCOLES");
+        enc.createCell(JUE).setCellValue("JUEVES");
+        enc.createCell(VIE).setCellValue("VIERNES");
+        enc.createCell(SAB).setCellValue("SÁBADO");
         enc.createCell(CLAVE_VIEJA).setCellValue("CLAVE"); // segunda CLAVE (plan 2004): se ignora
 
         Row sub = hoja.createRow(2);
-        for (int dia : new int[] {LUN, MAR, MIE}) {
+        for (int dia : new int[] {LUN, MAR, MIE, JUE, VIE, SAB}) {
             sub.createCell(dia).setCellValue("INI");
             sub.createCell(dia + 1).setCellValue("FIN");
             sub.createCell(dia + 2).setCellValue("AULA");
@@ -94,11 +103,16 @@ class ExcelOfertaReaderTest {
         poner(fila, colDia + 2, aula);
     }
 
-    private static InputStream aStream(XSSFWorkbook libro) throws IOException {
+    /** Serializa el libro a bytes .xlsx y lo cierra. */
+    private static byte[] bytes(XSSFWorkbook libro) throws IOException {
         ByteArrayOutputStream salida = new ByteArrayOutputStream();
         libro.write(salida);
         libro.close();
-        return new ByteArrayInputStream(salida.toByteArray());
+        return salida.toByteArray();
+    }
+
+    private static InputStream aStream(XSSFWorkbook libro) throws IOException {
+        return new ByteArrayInputStream(bytes(libro));
     }
 
     private boolean hayAdvertencia(String fragmento) {
@@ -185,6 +199,24 @@ class ExcelOfertaReaderTest {
         assertEquals(LocalTime.of(9, 0), h.inicio());
         assertEquals(LocalTime.of(11, 0), h.fin());
         assertEquals("N/D", h.aula());
+    }
+
+    @Test
+    @DisplayName("Reconoce las columnas de jueves, viernes y sábado (con acento)")
+    void juevesViernesSabado() throws Exception {
+        XSSFWorkbook libro = nuevoLibro(true);
+        Row f = fila(libro, "2", "LINC11", "FISICA", "CO01", "A");
+        clase(f, JUE, "07:00", "09:00", "J-1");
+        clase(f, VIE, "11:00", "13:00", "V-1");
+        clase(f, SAB, "08:00", "10:00", "S-1");
+
+        List<Horario> horarios = lector.leer(aStream(libro)).getMateria("LINC11").grupos().get(0).horarios();
+        assertEquals(List.of(
+                new Horario(DiaSemana.JUE, LocalTime.of(7, 0), LocalTime.of(9, 0), "J-1"),
+                new Horario(DiaSemana.VIE, LocalTime.of(11, 0), LocalTime.of(13, 0), "V-1"),
+                new Horario(DiaSemana.SAB, LocalTime.of(8, 0), LocalTime.of(10, 0), "S-1")),
+                horarios);
+        assertTrue(lector.getAdvertencias().isEmpty());
     }
 
     @Test
@@ -285,7 +317,7 @@ class ExcelOfertaReaderTest {
 
     @Test
     @DisplayName("Falta la hora de fin: se omite el horario y se avisa; el grupo queda sin horarios")
-    void falTaHoraFin() throws Exception {
+    void faltaHoraFin() throws Exception {
         XSSFWorkbook libro = nuevoLibro(true);
         clase(fila(libro, "2", "LINC11", "FISICA", "CO01", "A"), LUN, "09:00", null, "X");
 
@@ -459,10 +491,41 @@ class ExcelOfertaReaderTest {
         assertTrue(e.getMessage().contains("GPO"));
     }
 
-    private static byte[] bytes(XSSFWorkbook libro) throws IOException {
-        ByteArrayOutputStream salida = new ByteArrayOutputStream();
-        libro.write(salida);
-        libro.close();
-        return salida.toByteArray();
+    // ------------------------------------------------------------------ plantillas reales del repositorio
+
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+            "Plantilla_ICO_2025B__Normalizada.xlsx, 12, 38",
+            "Plantilla_ICO_2026A_Normalizada.xlsx,  12, 35"})
+    @DisplayName("Lee las plantillas reales de la UAEMex sin advertencias")
+    void plantillasReales(String archivo, int materiasEsperadas, int gruposEsperados) throws Exception {
+        OfertaAcademica oferta;
+        try (InputStream in = Files.newInputStream(Path.of(archivo))) {
+            oferta = lector.leer(in);
+        }
+
+        assertEquals(materiasEsperadas, oferta.materias().size());
+        assertEquals(gruposEsperados,
+                oferta.materias().values().stream().mapToInt(m -> m.grupos().size()).sum());
+        assertEquals(List.of(), lector.getAdvertencias());
+
+        Set<DiaSemana> dias = EnumSet.noneOf(DiaSemana.class);
+        oferta.materias().forEach((clave, materia) -> {
+            assertFalse(materia.nombre().isBlank(), "materia sin nombre: " + clave);
+            for (Grupo grupo : materia.grupos()) {
+                assertEquals(clave, grupo.claveMateria());
+                assertFalse(grupo.horarios().isEmpty(), "grupo sin horarios: " + clave + "/" + grupo.clave());
+                grupo.horarios().forEach(h -> dias.add(h.dia()));
+            }
+        });
+        assertEquals(EnumSet.allOf(DiaSemana.class), dias, "deben aparecer los seis días de la semana");
+
+        Grupo paradigmas = oferta.getMateria("LINC33").grupos().get(0);
+        assertEquals("CO01", paradigmas.clave());
+        assertEquals("ING. GUTIERREZ OCAMPO ELFEGO", paradigmas.docente());
+        Horario primera = paradigmas.horarios().get(0);
+        assertEquals(DiaSemana.MAR, primera.dia());
+        assertEquals(LocalTime.of(7, 0), primera.inicio());
+        assertEquals(LocalTime.of(9, 0), primera.fin());
     }
 }

@@ -14,8 +14,6 @@
         <junit.version>5.10.2</junit.version>
     </properties>
 
-    <!-- El código de producción está directamente en src/main/model, motor y parser. -->
-
     <dependencies>
         <!-- Jackson para lectura de JSON -->
         <dependency>
@@ -41,7 +39,6 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

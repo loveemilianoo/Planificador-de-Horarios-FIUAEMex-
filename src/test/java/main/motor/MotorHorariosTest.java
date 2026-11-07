@@ -136,7 +136,7 @@ class MotorHorariosTest {
                 new TablaSeriaciones(Map.of("MAT2", Set.of("MAT1"))));
         ResultadoGeneracion r = conSeriacion.generar(ofertaBase(), alumno(Set.of("MAT1"), Set.of("MAT2")));
 
-        assertTrue(r.materiasDescartadas().containsKey("MAT1") == false);
+        assertFalse(r.materiasDescartadas().containsKey("MAT2"));
         assertTrue(r.hayOpciones());
         r.opciones().forEach(o -> assertEquals("MAT2", o.grupos().get(0).claveMateria()));
     }
@@ -234,5 +234,21 @@ class MotorHorariosTest {
         ResultadoGeneracion r = limitado.generar(o, alumno(Set.of(), Set.of("MAT1", "MAT2")));
 
         assertTrue(hayAviso(r, "muchas combinaciones"));
+    }
+
+    @Test
+    @DisplayName("Si las combinaciones caben justo en el tope, no avisa de truncado")
+    void sinAvisoDeTruncadoEnElTope() {
+        OfertaAcademica o = oferta(
+                m("MAT1",
+                        g("MAT1", "G1", h(DiaSemana.LUN, "09:00", "10:00")),
+                        g("MAT1", "G2", h(DiaSemana.MAR, "09:00", "10:00"))),
+                m("MAT2", g("MAT2", "G1", h(DiaSemana.JUE, "09:00", "10:00"))));
+        MotorHorarios limitado = new MotorHorarios(TablaSeriaciones.vacia(),
+                new ConfiguracionMotor(1, 2, 2, LocalTime.of(13, 0)));
+        ResultadoGeneracion r = limitado.generar(o, alumno(Set.of(), Set.of("MAT1", "MAT2")));
+
+        assertEquals(2, r.opciones().size());
+        assertFalse(hayAviso(r, "muchas combinaciones"));
     }
 }

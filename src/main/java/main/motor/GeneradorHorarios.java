@@ -50,10 +50,15 @@ public class GeneradorHorarios {
         List<List<Grupo>> ordenadas = new ArrayList<>(gruposPorMateria);
         ordenadas.sort(Comparator.comparingInt(List::size));
 
+        // Se busca una candidata más que el tope: si aparece, de verdad quedaban combinaciones sin
+        // explorar. Con exactamente maxCandidatas combinaciones la búsqueda NO se considera truncada.
         List<OpcionHorario> candidatas = new ArrayList<>();
-        buscar(0, ordenadas, new ArrayList<>(), candidatas);
+        buscar(0, ordenadas, new ArrayList<>(), candidatas, config.maxCandidatas() + 1);
 
-        boolean truncada = candidatas.size() >= config.maxCandidatas();
+        boolean truncada = candidatas.size() > config.maxCandidatas();
+        if (truncada) {
+            candidatas = candidatas.subList(0, config.maxCandidatas());
+        }
         List<OpcionHorario> mejores = candidatas.stream()
                 .sorted(Comparator.comparingDouble(evaluador::puntaje))
                 .limit(config.maxOpciones())
@@ -62,7 +67,8 @@ public class GeneradorHorarios {
     }
 
     /** Recursión: en el nivel {@code idx} se prueba cada grupo de la materia idx. */
-    private void buscar(int idx, List<List<Grupo>> materias, List<Grupo> actual, List<OpcionHorario> candidatas) {
+    private void buscar(int idx, List<List<Grupo>> materias, List<Grupo> actual,
+                        List<OpcionHorario> candidatas, int limite) {
         if (idx == materias.size()) {
             candidatas.add(new OpcionHorario(actual)); // OpcionHorario copia la lista
             return;
@@ -72,9 +78,9 @@ public class GeneradorHorarios {
                 continue; // poda
             }
             actual.add(g);
-            buscar(idx + 1, materias, actual, candidatas);
+            buscar(idx + 1, materias, actual, candidatas, limite);
             actual.remove(actual.size() - 1); // backtrack
-            if (candidatas.size() >= config.maxCandidatas()) {
+            if (candidatas.size() >= limite) {
                 return;
             }
         }

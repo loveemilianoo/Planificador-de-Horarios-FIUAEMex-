@@ -1,6 +1,7 @@
 package main.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,6 +32,6 @@ class ParserExceptionTest {
     @DisplayName("Es una excepción verificada (obliga a manejarla)")
     void esVerificada() {
         assertTrue(Exception.class.isAssignableFrom(ParserException.class));
-        assertTrue(!RuntimeException.class.isAssignableFrom(ParserException.class));
+        assertFalse(RuntimeException.class.isAssignableFrom(ParserException.class));
     }
 }
