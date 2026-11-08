@@ -40,7 +40,7 @@ En cada reinscripción, los alumnos arman su horario a mano a partir de archivos
 ## Estructura del repositorio
 
 ```
-src/
+src/main/java/main/
 ├── model/    Records del dominio: Materia, Grupo, Horario, Alumno,
 │             OfertaAcademica, OpcionHorario, Turno, DiaSemana
 ├── parser/   OfertaReader (interfaz), ExcelOfertaReader,
@@ -49,6 +49,11 @@ src/
               FiltroPreferencias, GeneradorHorarios, DetectorTraslapes,
               EvaluadorOpcion, TablaSeriaciones, ConfiguracionMotor,
               ResultadoGeneracion
+
+src/test/java/main/
+├── model/, motor/, parser/   Pruebas unitarias (JUnit 5), mismo paquete que la clase probada
+├── integracion/              Prueba de punta a punta: JSON -> parser -> motor
+└── testutil/                 Datos: constructores cortos para armar datos de prueba
 ```
 
 ## Cómo funciona el motor
