@@ -26,16 +26,16 @@ En cada reinscripción, los alumnos arman su horario a mano a partir de archivos
 | Modelo de datos (`model`) | Terminado |
 | Parser Excel / JSON (`parser`) | Terminado |
 | Motor combinatorio (`motor`) | Terminado |
-| Capa web (Servlets + JSP, calendario) | Pendiente |
-| Empaquetado `.war` y despliegue en Tomcat | Pendiente |
+| Capa web (Servlets + JSP, calendario) | Terminado |
+| Empaquetado `.war` y despliegue en Tomcat | Terminado |
 
 ## Tecnologías
 
-- Java 17+
+- Java 21
 - Apache Maven
 - Jackson (`jackson-databind` 2.17.0) para JSON
 - Apache POI (`poi-ooxml` 5.2.5) para Excel
-- Servlets / JSP sobre Apache Tomcat (capa web, en desarrollo)
+- Servlets / JSP / JSTL (Jakarta EE 10) sobre Apache Tomcat 10.1 o superior
 
 ## Estructura del repositorio
 
@@ -51,6 +51,8 @@ src/main/java/main/
               ResultadoGeneracion
 
 src/main/resources/datos/     seriaciones.csv (prerrequisitos de las materias)
+src/main/java/main/web/       Capa web: PlanificadorServlet, AppContextListener, EstadoAlumno, ResultadoVista
+src/main/webapp/              index.jsp, css/estilos.css, WEB-INF/web.xml
 src/main/webapp/WEB-INF/vistas/   Vistas JSP del asistente
 
 src/test/java/main/
@@ -83,7 +85,7 @@ Dos clases se consideran traslapadas si coinciden el día y sus intervalos se cr
 
 ## Requisitos previos
 
-- JDK 17 o superior
+- JDK 21 o superior
 - Maven 3.8+
 
 ## Compilación
@@ -93,6 +95,19 @@ git clone https://github.com/loveemilianoo/Planificador-de-Horarios-FIUAEMex-.gi
 cd Planificador-de-Horarios-FIUAEMex-
 mvn clean compile
 ```
+
+## Despliegue en Tomcat
+
+Requiere **Tomcat 10.1 o superior** (usa los paquetes `jakarta.*`; no funciona en Tomcat 9).
+
+```bash
+mvn clean package          # genera target/planificador.war (ejecuta también las pruebas)
+```
+
+1. Copia `target/planificador.war` a la carpeta `webapps/` de Tomcat e inicia el servidor (`bin/startup.bat` o `bin/startup.sh`).
+2. Abre `http://localhost:8080/planificador/`.
+
+La oferta académica se lee al arrancar desde `src/main/resources/datos/Plantilla_ICO_2026A_Normalizada.xlsx`. Para usar otra plantilla, cópiala a esa carpeta y cambia el parámetro `ofertaRecurso` en `src/main/webapp/WEB-INF/web.xml`.
 
 ## Formatos de entrada
 
