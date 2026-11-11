@@ -17,11 +17,11 @@
             </div>
           </c:when>
           <c:otherwise>
-            <div class="row">
+            <label class="row">
               <input type="checkbox" name="sel" value="${fn:escapeXml(m.clave)}" class="sel"
                      ${estado.deseadas.contains(m.clave) ? 'checked' : ''}>
               <span style="flex:1"><c:out value="${m.nombre}"/></span>
-            </div>
+            </label>
           </c:otherwise>
         </c:choose>
       </c:forEach>
