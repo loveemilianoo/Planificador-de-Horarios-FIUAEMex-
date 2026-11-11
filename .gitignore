@@ -2,6 +2,9 @@
 # Ignora subir la carpeta de compilados de Maven. Evita subir archivos pesados como los .class, .jar o .war
 target/
 
+# Ignora la configuración local de Tomcat
+src/main/webapp/META-INF/
+
 # Ignora subir la configuracion local del editor
 .vscode/
 
