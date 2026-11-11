@@ -53,6 +53,16 @@ class FiltroPreferenciasTest {
     }
 
     @Test
+    @DisplayName("Sin preferencia de turno: admite grupos de mañana y de tarde")
+    void sinPreferenciaTurnoAdmiteAmbos() {
+        Grupo manana = g("A", "G1", h(DiaSemana.LUN, "09:00", "11:00"));
+        Grupo tarde = g("A", "G2", h(DiaSemana.LUN, "15:00", "17:00"));
+        var sinPref = alumno(Set.of(), Set.of(), Turno.SIN_PREFERENCIA, null);
+        assertTrue(filtro.admite(manana, sinPref));
+        assertTrue(filtro.admite(tarde, sinPref));
+    }
+
+    @Test
     @DisplayName("Turno tarde: admite clases que empiezan a la hora de corte o después")
     void turnoTardeAdmite() {
         Grupo grupo = g("A", "G1", h(DiaSemana.LUN, "13:00", "15:00"), h(DiaSemana.MAR, "17:00", "19:00"));

@@ -44,11 +44,14 @@ src/main/java/main/
 ├── model/    Records del dominio: Materia, Grupo, Horario, Alumno,
 │             OfertaAcademica, OpcionHorario, Turno, DiaSemana
 ├── parser/   OfertaReader (interfaz), ExcelOfertaReader,
-│             JsonOfertaReader, ParserException
+│             JsonOfertaReader, SeriacionesCsvReader, ParserException
 └── motor/    MotorHorarios (punto de entrada), FiltroMaterias,
               FiltroPreferencias, GeneradorHorarios, DetectorTraslapes,
               EvaluadorOpcion, TablaSeriaciones, ConfiguracionMotor,
               ResultadoGeneracion
+
+src/main/resources/datos/     seriaciones.csv (prerrequisitos de las materias)
+src/main/webapp/WEB-INF/vistas/   Vistas JSP del asistente
 
 src/test/java/main/
 ├── model/, motor/, parser/   Pruebas unitarias (JUnit 5), mismo paquete que la clase probada
@@ -124,6 +127,19 @@ Se usa la plantilla de horarios de la UAEMéx. El lector detecta las columnas **
 - Opcionales: `semestre` (0 si falta), `docente`, `aula` (se usa `N/D`).
 - Días válidos: `LUN`, `MAR`, `MIE`, `JUE`, `VIE`, `SAB` (también se acepta `MIER`).
 - Horas en formato `HH:mm`.
+
+### Seriaciones (`seriaciones.csv`)
+
+Ni el Excel ni el JSON traen seriaciones, así que viven en `src/main/resources/datos/seriaciones.csv` y las lee `SeriacionesCsvReader`, que construye la `TablaSeriaciones` que usa el motor:
+
+```
+# clave,prerrequisito  (la materia 'clave' requiere haber aprobado 'prerrequisito')
+clave,prerrequisito
+LINC35,LINC15
+```
+
+- Una fila por prerrequisito; UTF-8; se omiten líneas vacías y las que empiezan con `#`; la primera fila que no es comentario es el encabezado.
+- Se valida contra la oferta cargada: si la materia `clave` no está en la oferta, la fila se **ignora con una advertencia** (`getAdvertencias()`), lo normal con plantillas parciales; si la materia está pero su prerrequisito no, se lanza `ParserException` con el número de línea.
 
 ## Alcance
 

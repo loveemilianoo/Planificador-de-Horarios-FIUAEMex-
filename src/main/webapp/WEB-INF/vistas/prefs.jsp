@@ -19,22 +19,22 @@
           <c:otherwise>
             <div class="row">
               <input type="checkbox" name="sel" value="${fn:escapeXml(m.clave)}" class="sel"
-                     ${estado.seleccionadas.contains(m.clave) ? 'checked' : ''}>
+                     ${estado.deseadas.contains(m.clave) ? 'checked' : ''}>
               <span style="flex:1"><c:out value="${m.nombre}"/></span>
             </div>
           </c:otherwise>
         </c:choose>
       </c:forEach>
-      <p><b><span id="cuenta">${estado.seleccionadas.size()}</span> materias seleccionadas</b></p>
+      <p><b><span id="cuenta">${estado.deseadas.size()}</span> materias seleccionadas</b></p>
     </div>
     <div class="card">
       <h2>Preferencias de horario</h2>
       <p class="mu" style="margin:0">Turno</p>
-      <label class="row"><input type="radio" name="turno" value="mat" ${estado.turno == 'mat' ? 'checked' : ''}> Matutino</label>
-      <label class="row"><input type="radio" name="turno" value="ves" ${estado.turno == 'ves' ? 'checked' : ''}> Vespertino</label>
-      <label class="row"><input type="radio" name="turno" value="sin" ${estado.turno == 'sin' ? 'checked' : ''}> Sin preferencia</label>
+      <label class="row"><input type="radio" name="turno" value="mat" ${estado.turno == 'MANANA' ? 'checked' : ''}> Matutino</label>
+      <label class="row"><input type="radio" name="turno" value="ves" ${estado.turno == 'TARDE' ? 'checked' : ''}> Vespertino</label>
+      <label class="row"><input type="radio" name="turno" value="sin" ${estado.turno == 'SIN_PREFERENCIA' ? 'checked' : ''}> Sin preferencia</label>
       <p class="mu" style="margin:8px 0 0">Día libre</p>
-      <label class="row"><input type="checkbox" name="viernes" ${estado.viernesLibre ? 'checked' : ''}> Viernes</label>
+      <label class="row"><input type="checkbox" name="viernes" ${estado.diaLibre == 'VIE' ? 'checked' : ''}> Viernes</label>
     </div>
   </div>
   <div class="bar">
