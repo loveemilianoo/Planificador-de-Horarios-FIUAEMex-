@@ -15,7 +15,7 @@ import main.model.Turno;
  * - Turno: MAÑANA significa que todas las clases empiezan antes de la hora de corte;
  *   TARDE significa que todas empiezan a la hora de corte o después.
  *
- * Si el alumno no indicó preferencia (null), esa restricción no se aplica.
+ * Si el alumno no indicó turno (null) o eligió SIN_PREFERENCIA, esa restricción no se aplica.
  */
 public final class FiltroPreferencias {
 

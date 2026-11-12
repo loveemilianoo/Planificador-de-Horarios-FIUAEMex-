@@ -26,16 +26,16 @@ En cada reinscripción, los alumnos arman su horario a mano a partir de archivos
 | Modelo de datos (`model`) | Terminado |
 | Parser Excel / JSON (`parser`) | Terminado |
 | Motor combinatorio (`motor`) | Terminado |
-| Capa web (Servlets + JSP, calendario) | Pendiente |
-| Empaquetado `.war` y despliegue en Tomcat | Pendiente |
+| Capa web (Servlets + JSP, calendario) | Terminado |
+| Empaquetado `.war` y despliegue en Tomcat | Terminado |
 
 ## Tecnologías
 
-- Java 17+
+- Java 21
 - Apache Maven
 - Jackson (`jackson-databind` 2.17.0) para JSON
 - Apache POI (`poi-ooxml` 5.2.5) para Excel
-- Servlets / JSP sobre Apache Tomcat (capa web, en desarrollo)
+- Servlets / JSP / JSTL (Jakarta EE 10) sobre Apache Tomcat 10.1 o superior
 
 ## Estructura del repositorio
 
@@ -44,11 +44,16 @@ src/main/java/main/
 ├── model/    Records del dominio: Materia, Grupo, Horario, Alumno,
 │             OfertaAcademica, OpcionHorario, Turno, DiaSemana
 ├── parser/   OfertaReader (interfaz), ExcelOfertaReader,
-│             JsonOfertaReader, ParserException
+│             JsonOfertaReader, SeriacionesCsvReader, ParserException
 └── motor/    MotorHorarios (punto de entrada), FiltroMaterias,
               FiltroPreferencias, GeneradorHorarios, DetectorTraslapes,
               EvaluadorOpcion, TablaSeriaciones, ConfiguracionMotor,
               ResultadoGeneracion
+
+src/main/resources/datos/     seriaciones.csv (prerrequisitos de las materias)
+src/main/java/main/web/       Capa web: PlanificadorServlet, AppContextListener, EstadoAlumno, ResultadoVista
+src/main/webapp/              index.jsp, css/estilos.css, WEB-INF/web.xml
+src/main/webapp/WEB-INF/vistas/   Vistas JSP del asistente
 
 src/test/java/main/
 ├── model/, motor/, parser/   Pruebas unitarias (JUnit 5), mismo paquete que la clase probada
@@ -80,7 +85,7 @@ Dos clases se consideran traslapadas si coinciden el día y sus intervalos se cr
 
 ## Requisitos previos
 
-- JDK 17 o superior
+- JDK 21 o superior
 - Maven 3.8+
 
 ## Compilación
@@ -90,6 +95,19 @@ git clone https://github.com/loveemilianoo/Planificador-de-Horarios-FIUAEMex-.gi
 cd Planificador-de-Horarios-FIUAEMex-
 mvn clean compile
 ```
+
+## Despliegue en Tomcat
+
+Requiere **Tomcat 10.1 o superior** (usa los paquetes `jakarta.*`; no funciona en Tomcat 9).
+
+```bash
+mvn clean package          # genera target/planificador.war (ejecuta también las pruebas)
+```
+
+1. Copia `target/planificador.war` a la carpeta `webapps/` de Tomcat e inicia el servidor (`bin/startup.bat` o `bin/startup.sh`).
+2. Abre `http://localhost:8080/planificador/`.
+
+La oferta académica se lee al arrancar desde `src/main/resources/datos/Plantilla_ICO_2026A_Normalizada.xlsx`. Para usar otra plantilla, cópiala a esa carpeta y cambia el parámetro `ofertaRecurso` en `src/main/webapp/WEB-INF/web.xml`.
 
 ## Formatos de entrada
 
@@ -124,6 +142,19 @@ Se usa la plantilla de horarios de la UAEMéx. El lector detecta las columnas **
 - Opcionales: `semestre` (0 si falta), `docente`, `aula` (se usa `N/D`).
 - Días válidos: `LUN`, `MAR`, `MIE`, `JUE`, `VIE`, `SAB` (también se acepta `MIER`).
 - Horas en formato `HH:mm`.
+
+### Seriaciones (`seriaciones.csv`)
+
+Ni el Excel ni el JSON traen seriaciones, así que viven en `src/main/resources/datos/seriaciones.csv` y las lee `SeriacionesCsvReader`, que construye la `TablaSeriaciones` que usa el motor:
+
+```
+# clave,prerrequisito  (la materia 'clave' requiere haber aprobado 'prerrequisito')
+clave,prerrequisito
+LINC35,LINC15
+```
+
+- Una fila por prerrequisito; UTF-8; se omiten líneas vacías y las que empiezan con `#`; la primera fila que no es comentario es el encabezado.
+- Se valida contra la oferta cargada: si la materia `clave` no está en la oferta, la fila se **ignora con una advertencia** (`getAdvertencias()`), lo normal con plantillas parciales; si la materia está pero su prerrequisito no, se lanza `ParserException` con el número de línea.
 
 ## Alcance
 

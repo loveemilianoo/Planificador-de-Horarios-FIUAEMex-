@@ -1,0 +1,12 @@
+# clave,prerrequisito  (la materia 'clave' requiere haber aprobado 'prerrequisito')
+clave,prerrequisito
+LINC07,LINC03
+LINC01,LINC02
+LINC35,LINC15
+LINC04,LINC12
+LINC04,LINC03
+LINC05,LINC04
+LMU306,LMU209
+LMU404,LMU306
+LINC33,LINC32
+LINC21,LINC20
